@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
 
 interface ActivityOption {
   name: string;
@@ -80,29 +81,43 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
   return (
     <Dialog.Root open={open} onOpenChange={onClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white p-6 rounded-xl w-[90vw] max-w-md z-50">
-          <Dialog.Title className="text-xl font-bold mb-4">
-            Log {skillName} Activity
-          </Dialog.Title>
+        <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900/90 border border-gray-800 text-white p-6 rounded-2xl w-[90vw] max-w-md z-50 shadow-xl">
+          <div className="flex items-center justify-between mb-6">
+            <Dialog.Title className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Log {skillName} Activity
+            </Dialog.Title>
+            <Dialog.Close className="rounded-full p-1.5 hover:bg-gray-800 transition-colors">
+              <X className="h-5 w-5" />
+            </Dialog.Close>
+          </div>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 gap-2">
               {activities.map((activity) => (
                 <button
                   key={activity.name}
-                  onClick={() => setSelectedActivity(activity)}
-                  className={`p-3 rounded-lg text-left ${
+                  onClick={() => {
+                    setSelectedActivity(activity);
+                    if (activity.timeInterval > 0) {
+                      setDuration(activity.timeInterval);
+                    }
+                  }}
+                  className={`p-4 rounded-xl text-left transition-all duration-200 ${
                     selectedActivity?.name === activity.name
-                      ? "bg-blue-500"
-                      : "bg-gray-800 hover:bg-gray-700"
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg shadow-blue-500/20"
+                      : "bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-gray-600"
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <span>{activity.name}</span>
+                    <span className="font-medium">{activity.name}</span>
                     {activity.timeInterval > 0 && (
-                      <span className="text-sm opacity-75">
-                        ({activity.timeInterval} min = 1 point)
+                      <span className={`text-sm ${
+                        selectedActivity?.name === activity.name 
+                          ? "text-blue-200" 
+                          : "text-gray-400"
+                      }`}>
+                        {activity.timeInterval} min = 1 point
                       </span>
                     )}
                   </div>
@@ -111,29 +126,29 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
             </div>
 
             {selectedActivity && selectedActivity.timeInterval > 0 && (
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
+              <div className="space-y-3 bg-gray-800/30 p-4 rounded-xl border border-gray-700">
+                <label className="block text-sm font-medium text-gray-300">
                   Duration ({selectedActivity.timeInterval} minute intervals)
                 </label>
                 {selectedActivity.name === "Custom" ? (
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <input
                       type="number"
                       min="1"
                       value={customDuration}
                       onChange={(e) => setCustomDuration(Number(e.target.value))}
-                      className="w-full bg-gray-800 rounded-lg p-2 text-white"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-blue-400 font-medium">
                       Points to earn: {calculatePoints(selectedActivity, customDuration)}
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <select
                       value={duration}
                       onChange={(e) => setDuration(Number(e.target.value))}
-                      className="w-full bg-gray-800 rounded-lg p-2"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                       {[...Array(10)].map((_, i) => (
                         <option key={i} value={selectedActivity.timeInterval * (i + 1)}>
@@ -141,22 +156,25 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
                         </option>
                       ))}
                     </select>
+                    <div className="text-sm text-blue-400 font-medium">
+                      Points to earn: {calculatePoints(selectedActivity, duration)}
+                    </div>
                   </div>
                 )}
               </div>
             )}
 
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                className="px-4 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!selectedActivity}
-                className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:opacity-50"
+                className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-blue-500/20"
               >
                 Log Activity
               </button>
