@@ -12,42 +12,42 @@ export const SKILL_ACTIVITIES = {
     { name: "Wrestling practice", timeInterval: 60 },
     { name: "Specific drilling", timeInterval: 30 },
     { name: "Film Study", timeInterval: 20 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Strength": [
     { name: "Strength training", timeInterval: 60 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Endurance": [
     { name: "Run 2 miles", timeInterval: 0 }, // one-off activity
     { name: "HIIT cardio session", timeInterval: 30 },
     { name: "Wrestling conditioning", timeInterval: 60 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Spd/Agility": [
     { name: "Sprint intervals", timeInterval: 0 }, // one-off activity
     { name: "Ladder/agility drills", timeInterval: 20 },
     { name: "Plyometric exercises", timeInterval: 30 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Mindset": [
     { name: "Visualization", timeInterval: 10 },
     { name: "Mindfulness meditation", timeInterval: 10 },
     { name: "Gratitude journal", timeInterval: 10 },
     { name: "Positive self-talk", timeInterval: 10 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Rec/Health": [
     { name: "Ice bath/contrast shower", timeInterval: 0 }, // one-off activity
     { name: "Stretch/foam roll", timeInterval: 15 },
     { name: "1 gallon water intake", timeInterval: 0 }, // one-off activity
     { name: "Meet protein goal", timeInterval: 0 }, // one-off activity
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ],
   "Flexibility": [
     { name: "Yoga session", timeInterval: 30 },
     { name: "Static stretching", timeInterval: 15 },
-    { name: "Custom", timeInterval: 1 }
+    { name: "Custom", timeInterval: -1 }
   ]
 };
 
@@ -61,19 +61,24 @@ interface ActivityLogDialogProps {
 export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityLogDialogProps) {
   const [selectedActivity, setSelectedActivity] = useState<ActivityOption | null>(null);
   const [duration, setDuration] = useState(0);
-  const [customDuration, setCustomDuration] = useState(0);
+  const [customActivityName, setCustomActivityName] = useState("");
 
   const activities = SKILL_ACTIVITIES[skillName as keyof typeof SKILL_ACTIVITIES] || [];
 
   const calculatePoints = (activity: ActivityOption, activityDuration: number) => {
-    if (activity.timeInterval === 0) return 1;
+    if (activity.timeInterval === -1) return 1; // Custom activity
+    if (activity.timeInterval === 0) return 1;  // One-off activity
     return Math.floor(activityDuration / activity.timeInterval);
   };
 
   const handleSubmit = () => {
     if (selectedActivity) {
-      const finalDuration = selectedActivity.name === "Custom" ? customDuration : duration;
-      onLog(selectedActivity.name, finalDuration);
+      if (selectedActivity.timeInterval === -1) {
+        // For custom activities, use the custom name and no duration
+        onLog(customActivityName || "Custom activity", 0);
+      } else {
+        onLog(selectedActivity.name, duration);
+      }
       onClose();
     }
   };
@@ -102,6 +107,9 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
                     if (activity.timeInterval > 0) {
                       setDuration(activity.timeInterval);
                     }
+                    if (activity.timeInterval === -1) {
+                      setCustomActivityName("");
+                    }
                   }}
                   className={`p-4 rounded-xl text-left transition-all duration-200 ${
                     selectedActivity?.name === activity.name
@@ -125,26 +133,29 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
               ))}
             </div>
 
-            {selectedActivity && selectedActivity.timeInterval > 0 && (
+            {selectedActivity && (
               <div className="space-y-3 bg-gray-800/30 p-4 rounded-xl border border-gray-700">
-                <label className="block text-sm font-medium text-gray-300">
-                  Duration ({selectedActivity.timeInterval} minute intervals)
-                </label>
-                {selectedActivity.name === "Custom" ? (
+                {selectedActivity.timeInterval === -1 ? (
                   <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-300">
+                      Custom Activity Name
+                    </label>
                     <input
-                      type="number"
-                      min="1"
-                      value={customDuration}
-                      onChange={(e) => setCustomDuration(Number(e.target.value))}
+                      type="text"
+                      value={customActivityName}
+                      onChange={(e) => setCustomActivityName(e.target.value)}
+                      placeholder="Enter activity name"
                       className="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                     <div className="text-sm text-blue-400 font-medium">
-                      Points to earn: {calculatePoints(selectedActivity, customDuration)}
+                      Points to earn: 1
                     </div>
                   </div>
-                ) : (
+                ) : selectedActivity.timeInterval > 0 && (
                   <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-300">
+                      Duration
+                    </label>
                     <select
                       value={duration}
                       onChange={(e) => setDuration(Number(e.target.value))}
@@ -152,7 +163,7 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
                     >
                       {[...Array(10)].map((_, i) => (
                         <option key={i} value={selectedActivity.timeInterval * (i + 1)}>
-                          {selectedActivity.timeInterval * (i + 1)} minutes ({i + 1} points)
+                          {selectedActivity.timeInterval * (i + 1)} minutes
                         </option>
                       ))}
                     </select>
