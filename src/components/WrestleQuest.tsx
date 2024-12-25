@@ -121,11 +121,14 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     
     let pointsEarned = 0;
     if (selectedActivity) {
-      if (selectedActivity.timeInterval === 0) {
+      if (selectedActivity.timeInterval === 0 || selectedActivity.timeInterval === -1) {
         pointsEarned = 1;
       } else {
         pointsEarned = Math.floor(duration / selectedActivity.timeInterval);
       }
+    } else {
+      // This is a custom activity (with custom name)
+      pointsEarned = 1;
     }
     
     if (userData.lastActivityDate) {
@@ -146,8 +149,8 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     
     // Handle multiple level-ups
     const totalNewPoints = newUserData.skills[selectedSkillIndex].points + pointsEarned;
-    const levelUps = Math.floor(totalNewPoints / 3);
-    const remainingPoints = totalNewPoints % 3;
+    const levelUps = Math.floor(totalNewPoints / 5);
+    const remainingPoints = totalNewPoints % 5;
     
     if (levelUps > 0) {
       // First update total points and XP
@@ -199,7 +202,7 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
       const newXp = Math.max(0, userData.xp - userData.skills[skillIndex].xpValue);
       newUserData.xp = newXp;
 
-      if (newUserData.skills[skillIndex].totalPoints % 3 === 2 && newUserData.skills[skillIndex].rank > 1) {
+      if (newUserData.skills[skillIndex].totalPoints % 5 === 4 && newUserData.skills[skillIndex].rank > 1) {
         newUserData.skills[skillIndex].rank -= 1;
       }
 
@@ -209,7 +212,7 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
   };
 
   const getSkillMaxPoints = (totalPoints: number) => {
-    return Math.floor(totalPoints / 3) * 3 + 3;
+    return Math.floor(totalPoints / 5) * 5 + 5;
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -365,7 +368,7 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
                     <div className="flex items-center gap-2">
                       <div className="flex-1 relative">
                         <Progress 
-                          value={skill.isLevelingUp ? 100 : skill.points === 0 ? 5 : ((skill.points / 3) * 100)}
+                          value={skill.isLevelingUp ? 100 : skill.points === 0 ? 5 : ((skill.points / 5) * 100)}
                           className="h-5 bg-gray-800"
                           indicatorClassName={`${skill.color} transition-all duration-300 ease-in-out`}
                         />
