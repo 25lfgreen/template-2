@@ -122,10 +122,8 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     let pointsEarned = 0;
     if (selectedActivity) {
       if (selectedActivity.timeInterval === 0) {
-        // One-off activities earn 1 point
         pointsEarned = 1;
       } else {
-        // Calculate points based on duration and time interval
         pointsEarned = Math.floor(duration / selectedActivity.timeInterval);
       }
     }
@@ -145,29 +143,51 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     }
     
     newUserData.lastActivityDate = today.toISOString();
-    newUserData.skills[selectedSkillIndex].points += pointsEarned;
-    newUserData.skills[selectedSkillIndex].totalPoints += pointsEarned;
-    newUserData.xp += newUserData.skills[selectedSkillIndex].xpValue * pointsEarned;
     
-    if (newUserData.xp >= getXPThreshold(newUserData.level)) {
-      newUserData.level += 1;
-    }
+    // Handle multiple level-ups
+    const totalNewPoints = newUserData.skills[selectedSkillIndex].points + pointsEarned;
+    const levelUps = Math.floor(totalNewPoints / 3);
+    const remainingPoints = totalNewPoints % 3;
     
-    if (newUserData.skills[selectedSkillIndex].points >= 3) {
-      newUserData.skills[selectedSkillIndex].isLevelingUp = true;
+    if (levelUps > 0) {
+      // First update total points and XP
+      newUserData.skills[selectedSkillIndex].totalPoints += pointsEarned;
+      newUserData.xp += newUserData.skills[selectedSkillIndex].xpValue * pointsEarned;
       
+      // Then handle level ups
+      newUserData.skills[selectedSkillIndex].isLevelingUp = true;
+      newUserData.skills[selectedSkillIndex].points = remainingPoints;
+      newUserData.skills[selectedSkillIndex].rank += levelUps;
+      
+      // Update player level if XP threshold reached
+      if (newUserData.xp >= getXPThreshold(newUserData.level)) {
+        newUserData.level += Math.floor(newUserData.xp / getXPThreshold(newUserData.level));
+      }
+      
+      // Save the state immediately
+      setUserData(newUserData);
+      await saveToFirebase(newUserData);
+      
+      // Reset the leveling up animation after a delay
       setTimeout(() => {
-        const updatedData = { ...newUserData };
-        updatedData.skills[selectedSkillIndex].points = 0;
-        updatedData.skills[selectedSkillIndex].rank += 1;
-        updatedData.skills[selectedSkillIndex].isLevelingUp = false;
-        setUserData(updatedData);
-        saveToFirebase(updatedData);
+        const finalData = { ...newUserData };
+        finalData.skills[selectedSkillIndex].isLevelingUp = false;
+        setUserData(finalData);
+        saveToFirebase(finalData);
       }, 500);
+    } else {
+      // No level ups, just add points normally
+      newUserData.skills[selectedSkillIndex].points = totalNewPoints;
+      newUserData.skills[selectedSkillIndex].totalPoints += pointsEarned;
+      newUserData.xp += newUserData.skills[selectedSkillIndex].xpValue * pointsEarned;
+      
+      if (newUserData.xp >= getXPThreshold(newUserData.level)) {
+        newUserData.level += Math.floor(newUserData.xp / getXPThreshold(newUserData.level));
+      }
+      
+      setUserData(newUserData);
+      await saveToFirebase(newUserData);
     }
-
-    setUserData(newUserData);
-    await saveToFirebase(newUserData);
   };
 
   const handleSubtractSkillPoint = async (skillIndex: number) => {
