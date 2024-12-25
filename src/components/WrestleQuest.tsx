@@ -10,7 +10,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 import Settings from "@/components/Settings";
 import Journal from "@/components/Journal";
-import { ActivityLogDialog } from '@/components/ActivityLogDialog';
+import { ActivityLogDialog, SKILL_ACTIVITIES } from '@/components/ActivityLogDialog';
 
 const styles = {
   textWithStroke: {
@@ -114,7 +114,21 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     const today = new Date();
     const newUserData = { ...userData };
     
-    let pointsEarned = 1; // For now, keeping it simple with 1 point per activity
+    // Calculate points based on activity and duration
+    const selectedActivity = SKILL_ACTIVITIES[userData.skills[selectedSkillIndex].name]?.find(
+      act => act.name === activity
+    );
+    
+    let pointsEarned = 0;
+    if (selectedActivity) {
+      if (selectedActivity.timeInterval === 0) {
+        // One-off activities earn 1 point
+        pointsEarned = 1;
+      } else {
+        // Calculate points based on duration and time interval
+        pointsEarned = Math.floor(duration / selectedActivity.timeInterval);
+      }
+    }
     
     if (userData.lastActivityDate) {
       const lastDate = new Date(userData.lastActivityDate);

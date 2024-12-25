@@ -6,7 +6,7 @@ interface ActivityOption {
   timeInterval: number; // in minutes
 }
 
-const SKILL_ACTIVITIES = {
+export const SKILL_ACTIVITIES = {
   "Technique": [
     { name: "Wrestling practice", timeInterval: 60 },
     { name: "Specific drilling", timeInterval: 30 },
@@ -64,6 +64,11 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
 
   const activities = SKILL_ACTIVITIES[skillName as keyof typeof SKILL_ACTIVITIES] || [];
 
+  const calculatePoints = (activity: ActivityOption, activityDuration: number) => {
+    if (activity.timeInterval === 0) return 1;
+    return Math.floor(activityDuration / activity.timeInterval);
+  };
+
   const handleSubmit = () => {
     if (selectedActivity) {
       const finalDuration = selectedActivity.name === "Custom" ? customDuration : duration;
@@ -93,7 +98,14 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
                       : "bg-gray-800 hover:bg-gray-700"
                   }`}
                 >
-                  {activity.name}
+                  <div className="flex justify-between items-center">
+                    <span>{activity.name}</span>
+                    {activity.timeInterval > 0 && (
+                      <span className="text-sm opacity-75">
+                        ({activity.timeInterval} min = 1 point)
+                      </span>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -104,25 +116,32 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
                   Duration ({selectedActivity.timeInterval} minute intervals)
                 </label>
                 {selectedActivity.name === "Custom" ? (
-                  <input
-                    type="number"
-                    min="1"
-                    value={customDuration}
-                    onChange={(e) => setCustomDuration(Number(e.target.value))}
-                    className="w-full bg-gray-800 rounded-lg p-2 text-white"
-                  />
+                  <div className="space-y-1">
+                    <input
+                      type="number"
+                      min="1"
+                      value={customDuration}
+                      onChange={(e) => setCustomDuration(Number(e.target.value))}
+                      className="w-full bg-gray-800 rounded-lg p-2 text-white"
+                    />
+                    <div className="text-sm text-gray-400">
+                      Points to earn: {calculatePoints(selectedActivity, customDuration)}
+                    </div>
+                  </div>
                 ) : (
-                  <select
-                    value={duration}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                    className="w-full bg-gray-800 rounded-lg p-2"
-                  >
-                    {[...Array(10)].map((_, i) => (
-                      <option key={i} value={selectedActivity.timeInterval * (i + 1)}>
-                        {selectedActivity.timeInterval * (i + 1)} minutes
-                      </option>
-                    ))}
-                  </select>
+                  <div className="space-y-1">
+                    <select
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      className="w-full bg-gray-800 rounded-lg p-2"
+                    >
+                      {[...Array(10)].map((_, i) => (
+                        <option key={i} value={selectedActivity.timeInterval * (i + 1)}>
+                          {selectedActivity.timeInterval * (i + 1)} minutes ({i + 1} points)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 )}
               </div>
             )}
