@@ -10,6 +10,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 import Settings from "@/components/Settings";
 import Journal from "@/components/Journal";
+import { ActivityLogDialog } from '@/components/ActivityLogDialog';
 
 const styles = {
   textWithStroke: {
@@ -71,6 +72,8 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
   });
 
   const [currentPage, setCurrentPage] = useState<'home' | 'journal' | 'settings'>('home');
+  const [selectedSkillIndex, setSelectedSkillIndex] = useState<number | null>(null);
+  const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
 
   // Firebase sync effect (simplified)
   useEffect(() => {
@@ -101,8 +104,17 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
   };
 
   const handleAddSkillPoint = async (skillIndex: number) => {
+    setSelectedSkillIndex(skillIndex);
+    setIsActivityLogOpen(true);
+  };
+
+  const handleLogActivity = async (activity: string, duration: number) => {
+    if (selectedSkillIndex === null) return;
+
     const today = new Date();
     const newUserData = { ...userData };
+    
+    let pointsEarned = 1; // For now, keeping it simple with 1 point per activity
     
     if (userData.lastActivityDate) {
       const lastDate = new Date(userData.lastActivityDate);
@@ -111,8 +123,7 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
       if (dayDifference === 1) {
         newUserData.consecutiveDays += 1;
         if (newUserData.consecutiveDays % 7 === 0) {
-          newUserData.skills[skillIndex].points += 1;
-          newUserData.skills[skillIndex].totalPoints += 1;
+          pointsEarned += 1;
         }
       } else if (dayDifference > 1) {
         newUserData.consecutiveDays = 0;
@@ -120,38 +131,29 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     }
     
     newUserData.lastActivityDate = today.toISOString();
-    newUserData.skills[skillIndex].points += 1;
-    newUserData.skills[skillIndex].totalPoints += 1;
+    newUserData.skills[selectedSkillIndex].points += pointsEarned;
+    newUserData.skills[selectedSkillIndex].totalPoints += pointsEarned;
+    newUserData.xp += newUserData.skills[selectedSkillIndex].xpValue * pointsEarned;
     
-    // Add XP immediately when skill point is added
-    newUserData.xp += newUserData.skills[skillIndex].xpValue;
-    
-    // Level up if XP reaches 500, but keep excess XP
     if (newUserData.xp >= getXPThreshold(newUserData.level)) {
       newUserData.level += 1;
-      // No need to subtract XP anymore, it will continue accumulating
     }
     
-    // Check if skill should level up (still at 3 points)
-    if (newUserData.skills[skillIndex].points >= 3) {
-      newUserData.skills[skillIndex].isLevelingUp = true;
+    if (newUserData.skills[selectedSkillIndex].points >= 3) {
+      newUserData.skills[selectedSkillIndex].isLevelingUp = true;
       
       setTimeout(() => {
         const updatedData = { ...newUserData };
-        updatedData.skills[skillIndex].points = 0;
-        updatedData.skills[skillIndex].rank += 1;
-        updatedData.skills[skillIndex].isLevelingUp = false;
+        updatedData.skills[selectedSkillIndex].points = 0;
+        updatedData.skills[selectedSkillIndex].rank += 1;
+        updatedData.skills[selectedSkillIndex].isLevelingUp = false;
         setUserData(updatedData);
-        
-        const userDoc = doc(db, "users", userId);
-        setDoc(userDoc, updatedData);
+        saveToFirebase(updatedData);
       }, 500);
     }
 
     setUserData(newUserData);
-    
-    const userDoc = doc(db, "users", userId);
-    await setDoc(userDoc, newUserData);
+    await saveToFirebase(newUserData);
   };
 
   const handleSubtractSkillPoint = async (skillIndex: number) => {
@@ -460,6 +462,12 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
           </button>
         </div>
       </div>
+      <ActivityLogDialog
+        open={isActivityLogOpen}
+        onClose={() => setIsActivityLogOpen(false)}
+        skillName={selectedSkillIndex !== null ? userData.skills[selectedSkillIndex].name : ''}
+        onLog={handleLogActivity}
+      />
     </div>
   );
 } 
