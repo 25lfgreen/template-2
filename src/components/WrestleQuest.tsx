@@ -194,17 +194,22 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
   };
 
   const handleSubtractSkillPoint = async (skillIndex: number) => {
-    if (userData.skills[skillIndex].points > 0) {
+    const skill = userData.skills[skillIndex];
+    // Allow subtraction if there are points or if we're at a rank threshold
+    if (skill.points > 0 || (skill.points === 0 && skill.rank > 1)) {
       const newUserData = { ...userData };
-      newUserData.skills[skillIndex].points -= 1;
-      newUserData.skills[skillIndex].totalPoints -= 1;
       
+      if (skill.points === 0 && skill.rank > 1) {
+        // If at a rank threshold, set points to 4 and decrease rank
+        newUserData.skills[skillIndex].points = 4;
+        newUserData.skills[skillIndex].rank -= 1;
+      } else {
+        newUserData.skills[skillIndex].points -= 1;
+      }
+      
+      newUserData.skills[skillIndex].totalPoints -= 1;
       const newXp = Math.max(0, userData.xp - userData.skills[skillIndex].xpValue);
       newUserData.xp = newXp;
-
-      if (newUserData.skills[skillIndex].totalPoints % 5 === 4 && newUserData.skills[skillIndex].rank > 1) {
-        newUserData.skills[skillIndex].rank -= 1;
-      }
 
       setUserData(newUserData);
       await saveToFirebase(newUserData);
