@@ -399,21 +399,49 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
               ))}
             </div>
 
-            <div className="mt-8">
-              <h2 className="text-xl font-bold text-center mb-4">LEVEL SYSTEM</h2>
+            <div className="mt-4">
+              <h2 className="text-lg font-bold text-center mb-2 text-[#8B8FE5]">LEVEL SYSTEM</h2>
               <div className="grid grid-cols-5 gap-2">
                 {[
-                  { level: 1, title: "NOVICE", color: "bg-gradient-to-br from-orange-100 via-orange-200 to-orange-300" },
-                  { level: 5, title: "STRIKER", color: "bg-gradient-to-br from-sky-300 via-cyan-400 to-blue-600" },
-                  { level: 12, title: "GRAPPLER", color: "bg-gradient-to-br from-emerald-300 via-green-400 to-green-700" },
-                  { level: 25, title: "CHAMPION", color: "bg-gradient-to-br from-rose-300 via-pink-500 to-purple-700" },
-                  { level: 50, title: "LEGEND", color: "bg-gradient-to-br from-yellow-200 via-amber-400 to-orange-600" }
+                  { 
+                    level: 1, 
+                    title: "NOVICE", 
+                    color: "bg-gradient-to-br from-orange-100 via-orange-200 to-orange-300",
+                    border: "border-orange-200"
+                  },
+                  { 
+                    level: 5, 
+                    title: "STRIKER", 
+                    color: "bg-gradient-to-br from-sky-300 via-cyan-400 to-blue-600",
+                    border: "border-sky-300"
+                  },
+                  { 
+                    level: 12, 
+                    title: "GRAPPLER", 
+                    color: "bg-gradient-to-br from-emerald-300 via-green-400 to-green-700",
+                    border: "border-emerald-300"
+                  },
+                  { 
+                    level: 25, 
+                    title: "CHAMPION", 
+                    color: "bg-gradient-to-br from-rose-300 via-pink-500 to-purple-700",
+                    border: "border-rose-300"
+                  },
+                  { 
+                    level: 50, 
+                    title: "LEGEND", 
+                    color: "bg-gradient-to-br from-yellow-200 via-amber-400 to-orange-600",
+                    border: "border-yellow-200"
+                  }
                 ].map((rank) => (
                   <div key={rank.title} className="flex flex-col items-center">
-                    <div className={`w-10 h-10 rounded-full ${rank.color} flex items-center justify-center text-base font-bold shadow-lg text-white`}>
+                    <div 
+                      className={`w-12 h-12 rounded-2xl ${rank.color} flex items-center justify-center text-lg font-bold shadow-lg border-2 ${rank.border} text-black`}
+                      style={{ textShadow: '0 1px 1px rgba(255,255,255,0.5)' }}
+                    >
                       {rank.level}
                     </div>
-                    <div className="text-xs mt-1 text-center">{rank.title}</div>
+                    <div className="text-[10px] mt-1 text-center font-medium">{rank.title}</div>
                   </div>
                 ))}
               </div>
