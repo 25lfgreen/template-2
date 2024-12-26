@@ -36,7 +36,6 @@ interface UserData {
   level: number;
   xp: number;
   profileImage: string;
-  lastActivityDate: Date | null;
   skills: [
     { name: "Technique", points: number, color: "bg-blue-400", xpValue: number, rank: number, totalPoints: number, isLevelingUp: boolean },
     { name: "Strength", points: number, color: "bg-yellow-400", xpValue: number, rank: number, totalPoints: number, isLevelingUp: boolean },
@@ -59,7 +58,6 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     level: 1,
     xp: 0,
     profileImage: "/placeholder.svg",
-    lastActivityDate: null,
     skills: [
       { name: "Technique", points: 0, color: "bg-blue-400", xpValue: 50, rank: 1, totalPoints: 0, isLevelingUp: false },
       { name: "Strength", points: 0, color: "bg-yellow-400", xpValue: 50, rank: 1, totalPoints: 0, isLevelingUp: false },
