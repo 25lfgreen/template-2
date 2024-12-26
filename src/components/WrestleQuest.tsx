@@ -365,10 +365,11 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
             <div className="skill-points-section">
               {userData.skills.map((skill, index) => (
                 <div key={skill.name} className="flex items-center gap-2 mb-4">
-                  <div className="w-24 text-base flex items-center">{skill.name}</div>
+                  <div className="w-24 text-base font-semibold text-white">{skill.name}</div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs mb-1 flex items-center h-5">
-                      skill points: {skill.totalPoints}/{getSkillMaxPoints(skill.totalPoints)}
+                      <span className="text-gray-400">skill points:</span>
+                      <span className="text-white font-medium ml-1">{skill.totalPoints}/{getSkillMaxPoints(skill.totalPoints)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 relative">
@@ -400,7 +401,7 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
             </div>
 
             <div className="mt-4">
-              <h2 className="text-lg font-bold text-center mb-2 text-[#8B8FE5]">LEVEL SYSTEM</h2>
+              <h2 className="text-lg font-bold text-center mb-2 text-white">LEVEL SYSTEM</h2>
               <div className="grid grid-cols-5 gap-2">
                 {[
                   { 
