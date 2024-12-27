@@ -209,6 +209,10 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
       const newXp = Math.max(0, userData.xp - userData.skills[skillIndex].xpValue);
       newUserData.xp = newXp;
 
+      // Update level based on new XP
+      const newLevel = Math.floor(newXp / 500) + 1;
+      newUserData.level = newLevel;
+
       setUserData(newUserData);
       await saveToFirebase(newUserData);
     }
@@ -268,8 +272,10 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
     return "from-orange-100 via-orange-200 to-orange-300";
   };
 
-  const getProgressValue = (xp: number) => {
-    return ((xp % 500) / 500) * 100;
+  const getProgressValue = (xp: number, level: number) => {
+    const baseThreshold = (level - 1) * 500;
+    const progressInLevel = xp - baseThreshold;
+    return (progressInLevel / 500) * 100;
   };
 
   return (
@@ -347,11 +353,11 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
                 <div className="relative">
                   <div className="absolute w-full -top-5 flex justify-center">
                     <span className="font-mono text-sm text-white font-semibold" style={styles.textWithStroke}>
-                      XP: {userData.xp}/{getXPThreshold(userData.level)}
+                      XP: {userData.xp}/{userData.level * 500}
                     </span>
                   </div>
                   <Progress 
-                    value={getProgressValue(userData.xp)}
+                    value={getProgressValue(userData.xp, userData.level)}
                     className="h-6 bg-gray-800"
                     indicatorClassName={`bg-gradient-to-r ${getProgressBarColor(userData.level)}`}
                   />
