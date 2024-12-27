@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
@@ -62,6 +62,14 @@ export function ActivityLogDialog({ open, onClose, skillName, onLog }: ActivityL
   const [selectedActivity, setSelectedActivity] = useState<ActivityOption | null>(null);
   const [duration, setDuration] = useState(0);
   const [customActivityName, setCustomActivityName] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedActivity(null);
+      setDuration(0);
+      setCustomActivityName("");
+    }
+  }, [open, skillName]);
 
   const activities = SKILL_ACTIVITIES[skillName as keyof typeof SKILL_ACTIVITIES] || [];
 

@@ -189,6 +189,10 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
       setUserData(newUserData);
       await saveToFirebase(newUserData);
     }
+
+    // Close dialog and reset state
+    setIsActivityLogOpen(false);
+    setSelectedSkillIndex(null);
   };
 
   const handleSubtractSkillPoint = async (skillIndex: number) => {
@@ -539,7 +543,10 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
       </div>
       <ActivityLogDialog
         open={isActivityLogOpen}
-        onClose={() => setIsActivityLogOpen(false)}
+        onClose={() => {
+          setIsActivityLogOpen(false);
+          setSelectedSkillIndex(null);
+        }}
         skillName={selectedSkillIndex !== null ? userData.skills[selectedSkillIndex].name : ''}
         onLog={handleLogActivity}
       />
