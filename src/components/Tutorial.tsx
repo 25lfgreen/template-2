@@ -59,9 +59,9 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60]">
           <div className="bg-yellow-400 rounded-2xl p-6 mb-4 max-w-md">
             <p className="text-black text-lg font-medium">
-              "Hey there, champ! Welcome to WrestleQuest—your ultimate wrestling
-              training companion! I'm Coach Quest, and I'll be your guide. Let's
-              get you all set up and ready to crush your goals!"
+              Hey there, champ! Welcome to WrestleQuest&mdash;your ultimate wrestling
+              training companion! I&lsquo;m Coach Quest, and I&lsquo;ll be your guide. Let&lsquo;s
+              get you all set up and ready to crush your goals!
             </p>
           </div>
         </div>
@@ -73,8 +73,8 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         <div className="absolute top-32 left-1/2 -translate-x-1/2 z-[60]">
           <div className="bg-yellow-400 rounded-2xl p-6 max-w-md">
             <p className="text-black text-lg font-medium">
-              "First, let's add your profile picture! Tap the circle to upload a
-              photo that represents you."
+              First, let&apos;s add your profile picture! Tap the circle to upload a
+              photo that represents you.
             </p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         <div className="absolute top-32 left-1/2 -translate-x-1/2 z-[60]">
           <div className="bg-yellow-400 rounded-2xl p-6 max-w-md">
             <p className="text-black text-lg font-medium">
-              "Great! Now, let's add your name. What should I call you?"
+              Great! Now, let&apos;s add your name. What should I call you?
             </p>
           </div>
         </div>
@@ -98,9 +98,9 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         <div className="absolute top-32 left-1/2 -translate-x-1/2 z-[60]">
           <div className="bg-yellow-400 rounded-2xl p-6 max-w-md">
             <p className="text-black text-lg font-medium">
-              "Excellent! Now, what's your current wrestling quest? This could
-              be making the team, winning states, or any goal you're working
-              towards!"
+              Excellent! Now, what&apos;s your current wrestling quest? This could
+              be making the team, winning states, or any goal you&apos;re working
+              towards!
             </p>
           </div>
         </div>
@@ -112,10 +112,10 @@ export default function Tutorial({ onComplete }: TutorialProps) {
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60]">
           <div className="bg-yellow-400 rounded-2xl p-6 max-w-md">
             <p className="text-black text-lg font-medium">
-              "Perfect setup! Now you're ready to start logging your training.
+              Perfect setup! Now you&apos;re ready to start logging your training.
               After each session, add skill points to track your progress. As
-              you improve, you'll see your skills level up and your overall rank
-              increase. Let's begin your journey to greatness!"
+              you improve, you&apos;ll see your skills level up and your overall rank
+              increase. Let&apos;s begin your journey to greatness!
             </p>
           </div>
         </div>
