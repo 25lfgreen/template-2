@@ -130,7 +130,7 @@ export default function Journal({ userId }: { userId: string }) {
               <span>Back</span>
             </button>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              {format(new Date(selectedPastEntry.date), "MMMM d, yyyy")}
+              {format(new Date(selectedPastEntry.date + 'T00:00:00'), "MMMM d, yyyy")}
             </h2>
           </div>
 
@@ -230,7 +230,7 @@ export default function Journal({ userId }: { userId: string }) {
               className="w-full text-left bg-gray-900/50 p-6 rounded-xl hover:bg-gray-800/50 transition-all duration-200 backdrop-blur-sm group"
             >
               <div className="font-semibold text-lg mb-2 group-hover:text-blue-400 transition-colors">
-                {format(new Date(entry.date), "MMMM d, yyyy")}
+                {format(new Date(entry.date + 'T00:00:00'), "MMMM d, yyyy")}
               </div>
               {entry.journal && (
                 <div className="text-gray-400 line-clamp-2">

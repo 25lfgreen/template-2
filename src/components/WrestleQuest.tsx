@@ -467,8 +467,8 @@ export default function WrestleQuest({ userId }: WrestleQuestProps) {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 safe-bottom">
-        <div className="flex justify-around items-center h-16">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
+        <div className="flex justify-around items-center h-20 pb-8">
           <button
             onClick={() => setCurrentPage('home')}
             className={`flex flex-col items-center justify-center w-full h-full ${
